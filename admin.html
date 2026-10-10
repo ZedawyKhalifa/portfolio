@@ -78,6 +78,7 @@ small{color:var(--mute);display:block;margin-top:6px}
 
   <div class="box" style="margin-top:24px"><h2 style="margin-top:0">بيانات الموقع</h2><div id="site"></div></div>
 
+  <small id="who"></small>
   <p style="margin-top:20px"><button id="save">حفظ ونشر التعديلات</button> <button class="g" id="out">خروج</button></p>
   <small>بعد الحفظ، الموقع بيتحدّث بعد دقيقة تقريبًا.</small>
 </div>
@@ -101,7 +102,7 @@ function norm(){
 async function load(){
   const j=await api('data.json?ref='+cfg.branch+'&t='+Date.now());
   sha=j.sha;data=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))));
-  norm();$('#login').classList.add('hide');$('#panel').classList.remove('hide');render();
+  norm();$('#login').classList.add('hide');$('#panel').classList.remove('hide');render();$('#who').textContent='الصفحة شغالة بتوكن بيبدأ بـ '+cfg.token.slice(0,7)+' وبينتهي بـ '+cfg.token.slice(-4);
 }
 const F=[['tagline','الجملة تحت العنوان'],['about','نبذة عنك (About)'],['tools','الأدوات — بينهم فاصلة'],['services','الخدمات — بينهم فاصلة'],['stats','أرقام — مثال: 5+|Years of experience'],['showreel','رابط الـ Showreel'],['email','الإيميل'],['whatsapp','رقم واتساب بالكود الدولي'],['linktree','رابط Linktree'],['instagram','رابط إنستجرام'],['behance','رابط Behance'],['youtube','رابط قناة يوتيوب']];
 function site(){const b=$('#site');b.innerHTML='';F.forEach(([k,l])=>{const d=document.createElement('div');d.innerHTML=`<label>${l}</label><input>`;const i=d.querySelector('input');i.value=data.site[k]||'';i.oninput=()=>data.site[k]=i.value;b.appendChild(d)})}
@@ -152,7 +153,10 @@ $('#go').onclick=async()=>{
     else msg('فشل الدخول: '+m,'err')}
 };
 $('#out').onclick=()=>{localStorage.removeItem('zcfg');location.reload()};
-const explain=e=>/not accessible/i.test(e.message)?'التوكن بيقرا بس ومش بيكتب. اعمل توكن Classic بصلاحية public_repo (بيبدأ بـ ghp_)، أو عدّل الـ Fine-grained: Repository access = portfolio وContents = Read and write.':'خطأ: '+e.message;
+const explain=e=>{
+  if(/bad credentials/i.test(e.message)){localStorage.removeItem('zcfg');return 'التوكن اللي الصفحة شغالة بيه دلوقتي (بينتهي بـ ...'+cfg.token.slice(-4)+') GitHub بقى يرفضه. دوس "خروج" وادخل بالتوكن الجديد.'}
+  if(/not accessible/i.test(e.message))return 'التوكن بيقرا بس ومش بيكتب. اعمل توكن Classic بصلاحية public_repo (بيبدأ بـ ghp_)، أو عدّل الـ Fine-grained: Repository access = portfolio وContents = Read and write.';
+  return 'خطأ: '+e.message};
 const put=(path,body,onp)=>new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open('PUT',`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`);x.setRequestHeader('Authorization','Bearer '+cfg.token);x.setRequestHeader('Accept','application/vnd.github+json');x.upload.onprogress=e=>e.lengthComputable&&onp(Math.round(e.loaded/e.total*100));x.onload=()=>{let j={};try{j=JSON.parse(x.responseText)}catch(e){}x.status<300?res(j):rej(new Error(j.message||x.status))};x.onerror=()=>rej(new Error('انقطع الاتصال، جرب تاني'));x.send(body)});
 $('#add').onclick=async()=>{
   const title=$('#title').value.trim(),f=$('#file').files[0];let url=$('#url').value.trim();
