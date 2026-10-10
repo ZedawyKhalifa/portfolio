@@ -9,8 +9,16 @@
     "email": "ziadreda1221@gmail.com",
     "whatsapp": "201044772663",
     "linktree": "https://linktr.ee/ziad_zed",
-    "instagram": "", "behance": "", "youtube": ""
+    "instagram": "",
+    "behance": "",
+    "youtube": ""
   },
-  "editing": [],
-  "motion": []
+  "types": [
+    "Editing",
+    "Motion",
+    "Branding",
+    "Design",
+    "AI"
+  ],
+  "items": []
 }

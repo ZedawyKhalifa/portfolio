@@ -63,13 +63,20 @@ section{padding:72px var(--pad) 24px}
 .strip h2{font-family:var(--d);font-size:clamp(26px,3.8vw,48px);font-weight:700;letter-spacing:-.01em}
 .strip small{color:var(--mute);font-size:16px;font-weight:400;margin-left:8px}
 .strip i{flex:1;height:10px;background:repeating-linear-gradient(90deg,#fff 0 12px,transparent 12px 24px);border-radius:2px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:34px}
-.card{background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0}
-.film{position:relative;background:#161616;padding:18px 0;border-radius:6px;transition:transform .15s,box-shadow .3s;will-change:transform}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:clamp(150px,17vw,250px);grid-auto-flow:dense;gap:18px}
+.gallery .card:nth-child(10n+1){grid-column:1/span 2;grid-row:span 2}
+.gallery .card:nth-child(10n+6){grid-column:3/span 2;grid-row:span 2}
+.lab{position:absolute;left:0;right:0;bottom:0;padding:48px 16px 14px;background:linear-gradient(transparent,#000d);opacity:0;transform:translateY(14px);transition:opacity .35s,transform .35s;pointer-events:none}
+.lab b{display:block;font-family:var(--d);font-size:clamp(16px,1.8vw,24px);font-weight:700;border-left:4px solid var(--red);padding-left:10px}
+.lab span{display:block;margin:4px 0 0 14px;color:#ddd;font-size:14px}
+.card:hover .lab,.card:focus-visible .lab{opacity:1;transform:none}
+@media(hover:none){.lab{opacity:1;transform:none}}
+.card{display:block;width:100%;height:100%;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0}
+.film{position:relative;background:#161616;padding:18px 0;border-radius:6px;height:100%;display:flex;transition:transform .15s,box-shadow .3s;will-change:transform}
 .card:hover .film{box-shadow:0 20px 60px #f003}
 .film::before,.film::after{content:"";position:absolute;left:8px;right:8px;height:7px;background:repeating-linear-gradient(90deg,#e8e8e8 0 12px,transparent 12px 24px);border-radius:2px}
 .film::before{top:6px}.film::after{bottom:6px}
-.media{position:relative;aspect-ratio:16/9;background:#0b0b0b;overflow:hidden}
+.media{position:relative;flex:1;min-width:0;background:#0b0b0b;overflow:hidden}
 .media img,.media video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s}
 .card:hover .media img,.card:hover .media video{transform:scale(1.07)}
 .play{position:absolute;inset:0;display:grid;place-items:center;background:#0003}
@@ -100,7 +107,9 @@ dialog::backdrop{background:#000e}
 .rv{opacity:0;transform:translateY(46px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}
 .rv.in{opacity:1;transform:none}
 @media(hover:hover){body,a,button{cursor:none}}
-@media(max-width:760px){.about{grid-template-columns:1fr}nav a:not(.hire){display:none}.grid{grid-template-columns:1fr}}
+@media(max-width:1000px){.gallery{grid-template-columns:repeat(2,1fr);grid-auto-rows:clamp(130px,26vw,220px)}.gallery .card:nth-child(10n+1),.gallery .card:nth-child(10n+6){grid-column:1/span 2;grid-row:span 2}}
+@media(max-width:760px){.about{grid-template-columns:1fr}nav a:not(.hire){display:none}}
+@media(max-width:600px){.gallery{grid-template-columns:1fr;grid-auto-rows:auto}.gallery .card:nth-child(n){grid-column:auto;grid-row:auto;aspect-ratio:16/9;height:auto}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
@@ -108,21 +117,20 @@ dialog::backdrop{background:#000e}
 <div id="prog"></div><div id="cur"></div>
 <header>
   <a href="#top" aria-label="Zedawy"><img src="logo.png" alt="ZED"></a>
-  <nav><a href="#editing">Editing</a><a href="#motion">Motion</a><a href="#about">About</a><a class="hire" href="#contact">Hire me</a></nav>
+  <nav><a href="#work">Work</a><a href="#about">About</a><a class="hire" href="#contact">Hire me</a></nav>
 </header>
 
 <div class="hero" id="top">
   <div class="floor"><div></div></div>
   <h1>Visual<br><em>Artist.</em></h1>
   <p id="tag">I’ll take your brand to the world of Fashion 2090</p>
-  <div class="cta"><a class="btn" href="#editing"><i></i>See my work</a><button class="btn o" id="reelbtn" hidden><i></i>Watch showreel</button></div>
+  <div class="cta"><a class="btn" href="#work"><i></i>See my work</a><button class="btn o" id="reelbtn" hidden><i></i>Watch showreel</button></div>
 </div>
 <div class="reel" aria-hidden="true"><div id="marq"></div></div>
+
+<section id="work" style="padding-top:36px"><div class="gallery" id="gallery"></div></section>
 <div class="big" aria-hidden="true"><div id="big"></div></div>
 <div class="stats rv" id="stats"></div>
-
-<section id="editing"><div class="strip rv"><h2>Editing<small id="c-editing"></small></h2><i></i></div><div class="grid" id="g-editing"></div></section>
-<section id="motion"><div class="strip rv"><h2>Motion<small id="c-motion"></small></h2><i></i></div><div class="grid" id="g-motion"></div></section>
 
 <section id="about"><div class="strip rv"><h2>About</h2><i></i></div>
   <div class="about rv"><p id="about-t"></p>
@@ -186,23 +194,21 @@ fetch('data.json?'+Date.now()).then(r=>r.json()).then(d=>{
     $('reelbtn').hidden=false;$('reelbtn').onclick=()=>open_({title:'Showreel',url:S.showreel});
     if(direct(S.showreel)){const v=document.createElement('video');v.className='bgv';v.src=S.showreel;v.muted=v.loop=v.autoplay=v.playsInline=true;hero.prepend(v);v.play().catch(()=>{})}
   }
-  const row=['Editing','Motion','Branding','Design','AI','Fashion 2090'].map(w=>`<span>${w}</span>`).join('');
+  const row=['Visuals','Brands','Worlds','Design','AI','Futures'].map(w=>`<span>${w}</span>`).join('');
   $('marq').innerHTML=row+row+row+row;
   const big='<span>Fashion 2090</span><span>Fashion 2090</span>';
   $('big').innerHTML=big+big+big+big;
   $('stats').innerHTML=list(S.stats).map(x=>x.split('|')).map(([n,l])=>`<div><b data-n="${parseFloat(n)}" data-s="${esc(n.replace(/^[\d.]+/,''))}">${esc(n)}</b><span>${esc(l||'')}</span></div>`).join('');
-  ['editing','motion'].forEach(k=>{
-    const g=$('g-'+k),L=d[k]||[];
-    $('c-'+k).textContent=L.length||'';
-    if(!L.length){g.innerHTML='<p class="empty">New work is on the way.</p>';return}
-    L.forEach(it=>{
-      const b=document.createElement('button');b.className='card rv';
-      b.innerHTML=`<div class="film"><div class="media">${thumb(it)}<div class="play"><b></b></div></div></div><h3>${esc(it.title)}</h3>`;
-      const v=b.querySelector('video'),f=b.querySelector('.film');
-      if(v){b.onmouseenter=()=>v.play().catch(()=>{});b.onmouseleave=()=>{v.pause();v.currentTime=.5}}
-      if(hov){b.onpointermove=e=>{const r=f.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;f.style.transform=`perspective(700px) rotateY(${x*10}deg) rotateX(${-y*10}deg) scale(1.02)`};b.onpointerleave=()=>f.style.transform=''}
-      b.onclick=()=>open_(it);g.appendChild(b);
-    });
+  const all=d.items||[...(d.editing||[]).map(i=>({...i,type:'Editing'})),...(d.motion||[]).map(i=>({...i,type:'Motion'}))];
+  const g=$('gallery');
+  if(!all.length){g.style.display='block';g.innerHTML='<p class="empty">New work is on the way.</p>'}
+  all.forEach(it=>{
+    const b=document.createElement('button');b.className='card rv';
+    b.innerHTML=`<div class="film"><div class="media">${thumb(it)}<div class="play"><b></b></div><div class="lab"><b>${esc(it.type||'')}</b><span>${esc(it.title)}</span></div></div></div>`;
+    const v=b.querySelector('video'),f=b.querySelector('.film');
+    if(v){b.onmouseenter=()=>v.play().catch(()=>{});b.onmouseleave=()=>{v.pause();v.currentTime=.5}}
+    if(hov){b.onpointermove=e=>{const r=f.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;f.style.transform=`perspective(700px) rotateY(${x*8}deg) rotateX(${-y*8}deg) scale(1.02)`};b.onpointerleave=()=>f.style.transform=''}
+    b.onclick=()=>open_(it);g.appendChild(b);
   });
   $('about-t').textContent=S.about||'';
   if(!S.about)$('about').style.display='none';
@@ -210,7 +216,7 @@ fetch('data.json?'+Date.now()).then(r=>r.json()).then(d=>{
   $('svc').innerHTML=list(S.services).map(t=>`<li>${esc(t)}</li>`).join('');
   const links=[['Email',S.email&&'mailto:'+S.email],['WhatsApp',S.whatsapp&&'https://wa.me/'+S.whatsapp.replace(/\D/g,'')],['Linktree',S.linktree],['Instagram',S.instagram],['Behance',S.behance],['YouTube',S.youtube]].filter(x=>x[1]);
   $('links').innerHTML=links.map(([n,h],i)=>`<a class="btn${i?' o':''}" href="${esc(h)}" target="_blank" rel="noopener">${n}</a>`).join('')||'<span style="color:var(--mute)">Contact details coming soon.</span>';
-}).catch(()=>{document.querySelectorAll('.grid').forEach(g=>g.innerHTML='<p class="empty">Could not load data.json.</p>')})
+}).catch(()=>{$('gallery').innerHTML='<p class="empty">Could not load data.json.</p>'})
 .finally(()=>document.querySelectorAll('.rv').forEach(reveal));
 $('yr').textContent=new Date().getFullYear();
 </script>
