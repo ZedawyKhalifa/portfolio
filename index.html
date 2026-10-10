@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zedawy — Visual Artist</title>
+<meta name="description" content="Zedawy is a visual artist: video editing, motion graphics, brand identity and design.">
+<meta property="og:title" content="Zedawy — Visual Artist">
+<meta property="og:description" content="I'll take your brand to the world of Fashion 2090.">
+<meta property="og:image" content="logo.png">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--mute:#a0a0a0;--red:#f00;--line:#262626;--pad:clamp(16px,5vw,64px)}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{background:#000;color:#fff;font-family:Rubik,system-ui,sans-serif;line-height:1.55;overflow-x:hidden}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.07;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+#prog{position:fixed;top:0;left:0;right:0;height:3px;background:var(--red);transform:scaleX(0);transform-origin:0 50%;z-index:60}
+#cur{position:fixed;left:0;top:0;width:16px;height:16px;border-radius:50%;background:var(--red);mix-blend-mode:screen;pointer-events:none;z-index:70;opacity:0;transition:width .2s,height .2s}
+#cur.big{width:56px;height:56px;opacity:.55!important}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px var(--pad);position:sticky;top:0;background:#000c;backdrop-filter:blur(8px);z-index:5}
+header img{height:40px;display:block}
+nav{display:flex;gap:26px;align-items:center;font-weight:600}
+nav a{text-decoration:none;color:var(--mute)}
+nav a:hover{color:#fff}
+nav .hire{background:var(--red);color:#fff;padding:8px 18px;border-radius:4px}
+.hero{position:relative;overflow:hidden;padding:clamp(60px,11vw,140px) var(--pad) 70px;background:radial-gradient(circle 420px at var(--mx,70%) var(--my,30%),#ff000026,transparent 70%);isolation:isolate}
+.bgv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.28;z-index:-2}
+.floor{position:absolute;left:-20%;right:-20%;bottom:-8%;height:55%;z-index:-1;perspective:500px;pointer-events:none;-webkit-mask:linear-gradient(transparent,#000 70%);mask:linear-gradient(transparent,#000 70%)}
+.floor div{position:absolute;inset:0;transform:rotateX(62deg);transform-origin:50% 100%;background:repeating-linear-gradient(90deg,#ff000066 0 2px,transparent 2px 70px),repeating-linear-gradient(0deg,#ff000066 0 2px,transparent 2px 70px);animation:go 3s linear infinite}
+@keyframes go{to{background-position:0 70px,0 70px}}
+.hero h1{font-size:clamp(56px,13vw,190px);font-weight:800;line-height:.88;letter-spacing:-.045em;animation:rise 1s cubic-bezier(.2,.8,.2,1) both}
+.hero h1 em{font-style:normal;color:var(--red);text-shadow:0 0 50px #f006}
+.hero p{margin-top:28px;max-width:20ch;font-size:clamp(24px,3.4vw,44px);font-weight:600;line-height:1.15;letter-spacing:-.02em;min-height:2.3em}
+.cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px;animation:rise 1s .3s cubic-bezier(.2,.8,.2,1) both}
+.btn{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;border:1px solid var(--red);border-radius:4px;padding:14px 26px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none;transition:box-shadow .25s}
+.btn:hover{box-shadow:0 0 34px #f008}
+.btn.o{background:none;border-color:#444}
+.btn.o:hover{border-color:#fff;box-shadow:none}
+.btn i{width:14px;height:12px;background:#fff;clip-path:polygon(0 0,100% 50%,0 100%)}
+[hidden]{display:none!important}
+@keyframes rise{from{opacity:0;transform:translateY(40px)}}
+.reel{overflow:hidden;background:#fff;color:#000;padding:18px 0;position:relative;font-weight:800;font-size:clamp(22px,3vw,34px);letter-spacing:-.01em}
+.reel::before,.reel::after{content:"";position:absolute;left:0;right:0;height:6px;background:repeating-linear-gradient(90deg,#000 0 14px,transparent 14px 28px)}
+.reel::before{top:5px}.reel::after{bottom:5px}
+.reel div,.big div{display:flex;width:max-content;animation:run 28s linear infinite;padding:6px 0}
+.reel span,.big span{display:flex;align-items:center;gap:44px;white-space:nowrap;padding-right:44px}
+.reel span::after{content:"";width:16px;height:14px;background:var(--red);clip-path:polygon(0 0,100% 50%,0 100%)}
+.big{overflow:hidden;padding:36px 0 0}
+.big div{animation-direction:reverse;animation-duration:40s}
+.big span{font-size:clamp(70px,13vw,190px);font-weight:800;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:2px #fff3;line-height:1}
+.big span:nth-child(even){-webkit-text-stroke:2px var(--red);}
+@keyframes run{to{transform:translateX(-50%)}}
+.stats{display:flex;gap:clamp(28px,6vw,80px);flex-wrap:wrap;padding:30px var(--pad) 0}
+.stats b{display:block;font-size:clamp(40px,6vw,72px);font-weight:800;line-height:1;color:var(--red)}
+.stats span{color:var(--mute)}
+section{padding:72px var(--pad) 24px}
+.strip{display:flex;align-items:center;gap:18px;margin-bottom:30px}
+.strip h2{font-size:clamp(34px,5vw,64px);font-weight:800;letter-spacing:-.03em}
+.strip small{color:var(--mute);font-size:16px;font-weight:400;margin-left:8px}
+.strip i{flex:1;height:10px;background:repeating-linear-gradient(90deg,#fff 0 12px,transparent 12px 24px);border-radius:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:34px}
+.card{background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;padding:0}
+.film{position:relative;background:#161616;padding:18px 0;border-radius:6px;transition:transform .15s,box-shadow .3s;will-change:transform}
+.card:hover .film{box-shadow:0 20px 60px #f003}
+.film::before,.film::after{content:"";position:absolute;left:8px;right:8px;height:7px;background:repeating-linear-gradient(90deg,#e8e8e8 0 12px,transparent 12px 24px);border-radius:2px}
+.film::before{top:6px}.film::after{bottom:6px}
+.media{position:relative;aspect-ratio:16/9;background:#0b0b0b;overflow:hidden}
+.media img,.media video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s}
+.card:hover .media img,.card:hover .media video{transform:scale(1.07)}
+.play{position:absolute;inset:0;display:grid;place-items:center;background:#0003}
+.play b{width:62px;height:46px;background:var(--red);clip-path:polygon(0 14%,100% 0,100% 100%,0 86%);transition:transform .2s}
+.card:hover .play b{transform:scale(1.2)}
+.card h3{margin-top:14px;font-size:18px;font-weight:600}
+.empty{color:var(--mute);border:1px dashed var(--line);padding:40px;border-radius:6px}
+.about{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(28px,6vw,90px)}
+.about p{font-size:clamp(20px,2.4vw,30px);line-height:1.35;font-weight:600;max-width:32ch}
+.about h4{color:var(--mute);font-weight:600;margin:0 0 12px}
+.tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:34px}
+.tags span{border:1px solid #444;border-radius:99px;padding:7px 16px;transition:.2s}
+.tags span:hover{background:var(--red);border-color:var(--red)}
+.svc{list-style:none;padding:0}
+.svc li{padding:14px 0;border-bottom:1px solid var(--line);font-size:20px;font-weight:600;display:flex;align-items:center;gap:14px;transition:padding .25s}
+.svc li:hover{padding-left:14px}
+.svc li::before{content:"";width:12px;height:10px;background:var(--red);clip-path:polygon(0 0,100% 50%,0 100%)}
+.contact{padding-bottom:90px}
+.contact h2{font-size:clamp(44px,9vw,130px);font-weight:800;line-height:.92;letter-spacing:-.04em;margin-bottom:36px}
+.links{display:flex;gap:12px;flex-wrap:wrap}
+footer{padding:36px var(--pad);color:var(--mute);border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+dialog{width:min(1100px,94vw);border:0;border-radius:8px;background:#000;color:#fff;padding:0;overflow:hidden;box-shadow:0 0 120px #f004}
+dialog::backdrop{background:#000e}
+.frame{aspect-ratio:16/9;background:#000}
+.frame iframe,.frame video{width:100%;height:100%;border:0;display:block}
+.bar{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;font-weight:600}
+.bar button{background:var(--red);color:#fff;border:0;border-radius:4px;padding:8px 16px;font:inherit;font-weight:600;cursor:pointer}
+.rv{opacity:0;transform:translateY(46px);transition:opacity .8s,transform .8s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media(hover:hover){body,a,button{cursor:none}}
+@media(max-width:760px){.about{grid-template-columns:1fr}nav a:not(.hire){display:none}.grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div id="prog"></div><div id="cur"></div>
+<header>
+  <a href="#top" aria-label="Zedawy"><img src="logo.png" alt="ZED"></a>
+  <nav><a href="#editing">Editing</a><a href="#motion">Motion</a><a href="#about">About</a><a class="hire" href="#contact">Hire me</a></nav>
+</header>
+
+<div class="hero" id="top">
+  <div class="floor"><div></div></div>
+  <h1>Visual<br><em>Artist.</em></h1>
+  <p id="tag">I’ll take your brand to the world of Fashion 2090</p>
+  <div class="cta"><a class="btn" href="#editing"><i></i>See my work</a><button class="btn o" id="reelbtn" hidden><i></i>Watch showreel</button></div>
+</div>
+<div class="reel" aria-hidden="true"><div id="marq"></div></div>
+<div class="big" aria-hidden="true"><div id="big"></div></div>
+<div class="stats rv" id="stats"></div>
+
+<section id="editing"><div class="strip rv"><h2>Editing<small id="c-editing"></small></h2><i></i></div><div class="grid" id="g-editing"></div></section>
+<section id="motion"><div class="strip rv"><h2>Motion<small id="c-motion"></small></h2><i></i></div><div class="grid" id="g-motion"></div></section>
+
+<section id="about"><div class="strip rv"><h2>About</h2><i></i></div>
+  <div class="about rv"><p id="about-t"></p>
+  <div><h4>Tools</h4><div class="tags" id="tools"></div><h4>Services</h4><ul class="svc" id="svc"></ul></div></div>
+</section>
+
+<section class="contact" id="contact"><h2 class="rv">Got a project?<br>Let's talk.</h2><div class="links rv" id="links"></div></section>
+
+<footer><span>© <span id="yr"></span> Zedawy</span><span>Visual Artist</span></footer>
+
+<dialog id="dlg"><div class="frame" id="frame"></div><div class="bar"><span id="dt"></span><button id="close">Close</button></div></dialog>
+
+<script>
+const $=id=>document.getElementById(id);
+const yt=u=>(u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/)||[])[1];
+const vm=u=>(u.match(/vimeo\.com\/(?:video\/)?(\d+)/)||[])[1];
+const gd=u=>(u.match(/drive\.google\.com\/file\/d\/([\w-]+)/)||[])[1];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const list=s=>(s||'').split(',').map(x=>x.trim()).filter(Boolean);
+const direct=u=>!(yt(u)||vm(u)||gd(u));
+
+function thumb(it){
+  if(it.thumb) return `<img src="${esc(it.thumb)}" alt="" loading="lazy">`;
+  const y=yt(it.url);
+  if(y) return `<img src="https://img.youtube.com/vi/${y}/hqdefault.jpg" alt="" loading="lazy">`;
+  if(!direct(it.url)) return '';
+  return `<video src="${esc(it.url)}#t=0.5" preload="metadata" muted loop playsinline></video>`;
+}
+function player(u){
+  const y=yt(u),v=vm(u),g=gd(u);
+  if(y) return `<iframe src="https://www.youtube.com/embed/${y}?autoplay=1&rel=0" allow="autoplay;fullscreen" allowfullscreen></iframe>`;
+  if(v) return `<iframe src="https://player.vimeo.com/video/${v}?autoplay=1" allow="autoplay;fullscreen" allowfullscreen></iframe>`;
+  if(g) return `<iframe src="https://drive.google.com/file/d/${g}/preview" allow="autoplay;fullscreen" allowfullscreen></iframe>`;
+  return `<video src="${esc(u)}" controls autoplay playsinline></video>`;
+}
+const dlg=$('dlg'),frame=$('frame');
+const open_=it=>{$('dt').textContent=it.title;frame.innerHTML=player(it.url);dlg.showModal()};
+const close_=()=>{dlg.close();frame.innerHTML=''};
+$('close').onclick=close_;
+dlg.addEventListener('click',e=>{if(e.target===dlg)close_()});
+dlg.addEventListener('cancel',()=>{frame.innerHTML=''});
+
+/* effects */
+const hov=matchMedia('(hover:hover)').matches;
+addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.transform=`scaleX(${scrollY/Math.max(1,h.scrollHeight-innerHeight)})`},{passive:true});
+const hero=document.querySelector('.hero');
+hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();hero.style.setProperty('--mx',e.clientX-r.left+'px');hero.style.setProperty('--my',e.clientY-r.top+'px')});
+if(hov){const c=$('cur');let x=0,y=0,tx=0,ty=0;
+  addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY;c.style.opacity=1});
+  (function f(){x+=(tx-x)*.2;y+=(ty-y)*.2;c.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)`;requestAnimationFrame(f)})();
+  document.addEventListener('pointerover',e=>c.classList.toggle('big',!!e.target.closest('a,button')))}
+function scramble(el,txt){const ch='01#/<>*+';let i=0;const t=setInterval(()=>{el.textContent=txt.split('').map((c,j)=>j<i||c===' '?c:ch[Math.random()*ch.length|0]).join('');i+=1.2;if(i>txt.length){el.textContent=txt;clearInterval(t)}},28)}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);
+  if(e.target.id==='stats')e.target.querySelectorAll('b').forEach(b=>{const n=parseFloat(b.dataset.n);if(isNaN(n))return;const s=b.dataset.s||'';let k=0;const t=setInterval(()=>{k+=.04;b.textContent=Math.round(n*Math.min(k,1))+s;if(k>=1)clearInterval(t)},30)})}}),{threshold:.15});
+const reveal=el=>io.observe(el);
+
+fetch('data.json?'+Date.now()).then(r=>r.json()).then(d=>{
+  const S=d.site||{};
+  scramble($('tag'),S.tagline||$('tag').textContent);
+  if(S.showreel){
+    $('reelbtn').hidden=false;$('reelbtn').onclick=()=>open_({title:'Showreel',url:S.showreel});
+    if(direct(S.showreel)){const v=document.createElement('video');v.className='bgv';v.src=S.showreel;v.muted=v.loop=v.autoplay=v.playsInline=true;hero.prepend(v);v.play().catch(()=>{})}
+  }
+  const row=['Editing','Motion','Branding','Design','AI','Fashion 2090'].map(w=>`<span>${w}</span>`).join('');
+  $('marq').innerHTML=row+row+row+row;
+  const big='<span>Fashion 2090</span><span>Fashion 2090</span>';
+  $('big').innerHTML=big+big+big+big;
+  $('stats').innerHTML=list(S.stats).map(x=>x.split('|')).map(([n,l])=>`<div><b data-n="${parseFloat(n)}" data-s="${esc(n.replace(/^[\d.]+/,''))}">${esc(n)}</b><span>${esc(l||'')}</span></div>`).join('');
+  ['editing','motion'].forEach(k=>{
+    const g=$('g-'+k),L=d[k]||[];
+    $('c-'+k).textContent=L.length||'';
+    if(!L.length){g.innerHTML='<p class="empty">New work is on the way.</p>';return}
+    L.forEach(it=>{
+      const b=document.createElement('button');b.className='card rv';
+      b.innerHTML=`<div class="film"><div class="media">${thumb(it)}<div class="play"><b></b></div></div></div><h3>${esc(it.title)}</h3>`;
+      const v=b.querySelector('video'),f=b.querySelector('.film');
+      if(v){b.onmouseenter=()=>v.play().catch(()=>{});b.onmouseleave=()=>{v.pause();v.currentTime=.5}}
+      if(hov){b.onpointermove=e=>{const r=f.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;f.style.transform=`perspective(700px) rotateY(${x*10}deg) rotateX(${-y*10}deg) scale(1.02)`};b.onpointerleave=()=>f.style.transform=''}
+      b.onclick=()=>open_(it);g.appendChild(b);
+    });
+  });
+  $('about-t').textContent=S.about||'';
+  if(!S.about)$('about').style.display='none';
+  $('tools').innerHTML=list(S.tools).map(t=>`<span>${esc(t)}</span>`).join('');
+  $('svc').innerHTML=list(S.services).map(t=>`<li>${esc(t)}</li>`).join('');
+  const links=[['Email',S.email&&'mailto:'+S.email],['WhatsApp',S.whatsapp&&'https://wa.me/'+S.whatsapp.replace(/\D/g,'')],['Linktree',S.linktree],['Instagram',S.instagram],['Behance',S.behance],['YouTube',S.youtube]].filter(x=>x[1]);
+  $('links').innerHTML=links.map(([n,h],i)=>`<a class="btn${i?' o':''}" href="${esc(h)}" target="_blank" rel="noopener">${n}</a>`).join('')||'<span style="color:var(--mute)">Contact details coming soon.</span>';
+}).catch(()=>{document.querySelectorAll('.grid').forEach(g=>g.innerHTML='<p class="empty">Could not load data.json.</p>')})
+.finally(()=>document.querySelectorAll('.rv').forEach(reveal));
+$('yr').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>

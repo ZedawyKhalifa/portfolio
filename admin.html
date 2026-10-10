@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Zedawy — لوحة التحكم</title>
+<link rel="icon" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--red:#f00;--line:#2a2a2a;--mute:#9a9a9a}
+*{box-sizing:border-box;margin:0}
+body{background:#000;color:#fff;font-family:Rubik,system-ui,sans-serif;padding:24px clamp(16px,4vw,48px);max-width:920px;margin:auto}
+img.logo{height:40px;margin-bottom:24px}
+h2{margin:32px 0 12px;font-size:22px}
+.box{border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px}
+label{display:block;font-size:14px;color:var(--mute);margin:10px 0 4px}
+input,select{width:100%;background:#111;color:#fff;border:1px solid var(--line);border-radius:6px;padding:10px;font:inherit}
+button{background:var(--red);color:#fff;border:0;border-radius:6px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer}
+button.g{background:#222}
+button:disabled{opacity:.5;cursor:wait}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.row input{flex:1}
+.row button{padding:8px 12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#msg{position:sticky;bottom:12px;background:#111;border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:16px;display:none}
+#msg.ok{border-color:#2ecc71}#msg.err{border-color:var(--red)}
+small{color:var(--mute);display:block;margin-top:6px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<img class="logo" src="logo.png" alt="ZED">
+
+<div class="box" id="login">
+  <h2 style="margin-top:0">تسجيل الدخول</h2>
+  <div class="two">
+    <div><label>اسم حسابك على GitHub</label><input id="owner" placeholder="username"></div>
+    <div><label>اسم الريبو</label><input id="repo" placeholder="zedawy"></div>
+  </div>
+  <div class="two">
+    <div><label>البرانش</label><input id="branch" value="main"></div>
+    <div><label>GitHub Token</label><input id="token" type="password" placeholder="github_pat_..."></div>
+  </div>
+  <small>التوكن بيتحفظ في متصفحك بس. اعمله Fine-grained على ريبو الموقع بس، وبصلاحية Contents: Read and write.</small>
+  <p style="margin-top:14px"><button id="go">دخول</button></p>
+</div>
+
+<div id="panel" class="hide">
+  <div class="box">
+    <h2 style="margin-top:0">إضافة فيديو</h2>
+    <div class="two">
+      <div><label>القسم</label><select id="sec"><option value="editing">Editing</option><option value="motion">Motion</option></select></div>
+      <div><label>عنوان الفيديو</label><input id="title"></div>
+    </div>
+    <label>رابط الفيديو (YouTube / Vimeo / Google Drive / رابط mp4 مباشر)</label>
+    <input id="url" placeholder="https://...">
+    <label>رابط صورة مصغرة Thumbnail (اختياري — يوتيوب بياخدها لوحده)</label>
+    <input id="thumb" placeholder="https://...jpg">
+    <label>أو ارفع ملف فيديو (لحد 90MB)</label>
+    <input id="file" type="file" accept="video/*">
+    <p style="margin-top:14px"><button id="add">إضافة</button></p>
+  </div>
+
+  <div class="box"><h2 style="margin-top:0">بيانات الموقع</h2><div id="site"></div></div>
+  <h2>Editing</h2><div id="l-editing"></div>
+  <h2>Motion</h2><div id="l-motion"></div>
+  <p style="margin-top:20px"><button id="save">حفظ ونشر التعديلات</button> <button class="g" id="out">خروج</button></p>
+  <small>بعد الحفظ، الموقع بيتحدّث بعد دقيقة تقريبًا.</small>
+</div>
+<div id="msg"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+let cfg=JSON.parse(localStorage.zcfg||'{}'),data={editing:[],motion:[]},sha=null;
+const msg=(t,c='')=>{const m=$('#msg');m.textContent=t;m.className=c;m.style.display='block'};
+const u8=s=>btoa(unescape(encodeURIComponent(s)));
+const api=(p,o={})=>fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${p}`,{...o,headers:{Authorization:'Bearer '+cfg.token,Accept:'application/vnd.github+json','Content-Type':'application/json'}}).then(async r=>{const j=await r.json();if(!r.ok)throw new Error(j.message||r.status);return j});
+
+async function load(){
+  const j=await api('data.json?ref='+cfg.branch+'&t='+Date.now());
+  sha=j.sha;data=JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g,'')))));
+  data.editing=data.editing||[];data.motion=data.motion||[];data.site=data.site||{};
+  $('#login').classList.add('hide');$('#panel').classList.remove('hide');render();
+}
+const F=[['tagline','الجملة تحت العنوان'],['about','نبذة عنك (About)'],['tools','الأدوات — بينهم فاصلة (Premiere Pro, After Effects)'],['services','الخدمات — بينهم فاصلة'],['stats','أرقام — مثال: 50+|مشروع, 3|سنين خبرة'],['showreel','رابط الـ Showreel'],['email','الإيميل'],['whatsapp','رقم واتساب بالكود الدولي (مثال 201012345678)'],['linktree','رابط Linktree'],['instagram','رابط إنستجرام'],['behance','رابط Behance'],['youtube','رابط قناة يوتيوب']];
+function site(){const b=$('#site');b.innerHTML='';F.forEach(([k,l])=>{const d=document.createElement('div');d.innerHTML=`<label>${l}</label><input>`;const i=d.querySelector('input');i.value=data.site[k]||'';i.oninput=()=>data.site[k]=i.value;b.appendChild(d)})}
+function render(){site();
+  ['editing','motion'].forEach(k=>{
+    const box=$('#l-'+k);box.innerHTML='';
+    if(!data[k].length)box.innerHTML='<small>مفيش فيديوهات هنا لسه.</small>';
+    data[k].forEach((it,i)=>{
+      const r=document.createElement('div');r.className='row';
+      r.innerHTML=`<input value="${it.title.replace(/"/g,'&quot;')}"><button class="g" title="فوق">↑</button><button class="g" title="تحت">↓</button><button title="حذف">حذف</button>`;
+      const [inp,up,dn,del]=r.children;
+      inp.oninput=()=>it.title=inp.value;
+      up.onclick=()=>{if(i){[data[k][i-1],data[k][i]]=[data[k][i],data[k][i-1]];render()}};
+      dn.onclick=()=>{if(i<data[k].length-1){[data[k][i+1],data[k][i]]=[data[k][i],data[k][i+1]];render()}};
+      del.onclick=()=>{if(confirm('تحذف "'+it.title+'"؟')){data[k].splice(i,1);render()}};
+      box.appendChild(r);
+    });
+  });
+}
+$('#go').onclick=async()=>{
+  cfg={owner:$('#owner').value.trim(),repo:$('#repo').value.trim(),branch:$('#branch').value.trim()||'main',token:$('#token').value.trim()};
+  try{msg('جاري الدخول...');await load();localStorage.zcfg=JSON.stringify(cfg);$('#msg').style.display='none'}catch(e){msg('فشل الدخول: '+e.message,'err')}
+};
+$('#out').onclick=()=>{localStorage.removeItem('zcfg');location.reload()};
+$('#add').onclick=async()=>{
+  const title=$('#title').value.trim(),f=$('#file').files[0];let url=$('#url').value.trim();
+  if(!title)return msg('اكتب عنوان للفيديو','err');
+  if(!url&&!f)return msg('حط رابط أو اختار ملف','err');
+  const b=$('#add');b.disabled=true;
+  try{
+    if(f){
+      if(f.size>90*1024*1024)throw new Error('الملف أكبر من 90MB، استخدم رابط يوتيوب أو درايف');
+      msg('جاري رفع الفيديو... استنى');
+      const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
+      const path='videos/'+Date.now()+'-'+f.name.replace(/[^\w.-]/g,'_');
+      await api(path,{method:'PUT',body:JSON.stringify({message:'Upload '+f.name,content:b64,branch:cfg.branch})});
+      url=path;
+    }
+    const it={title,url};if($('#thumb').value.trim())it.thumb=$('#thumb').value.trim();data[$('#sec').value].unshift(it);
+    $('#title').value=$('#url').value=$('#thumb').value='';$('#file').value='';render();
+    msg('اتضاف. دوس "حفظ ونشر التعديلات" عشان تظهر في الموقع.','ok');
+  }catch(e){msg('خطأ: '+e.message,'err')}
+  b.disabled=false;
+};
+$('#save').onclick=async()=>{
+  const b=$('#save');b.disabled=true;msg('جاري الحفظ...');
+  try{
+    const r=await api('data.json',{method:'PUT',body:JSON.stringify({message:'Update portfolio',content:u8(JSON.stringify(data,null,2)),sha,branch:cfg.branch})});
+    sha=r.content.sha;msg('اتحفظ ✔ الموقع هيتحدّث خلال دقيقة.','ok');
+  }catch(e){msg('خطأ: '+e.message,'err')}
+  b.disabled=false;
+};
+if(cfg.token){$('#owner').value=cfg.owner;$('#repo').value=cfg.repo;$('#branch').value=cfg.branch;$('#token').value=cfg.token;$('#go').click()}
+</script>
+</body>
+</html>
