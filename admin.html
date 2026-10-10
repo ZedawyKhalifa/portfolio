@@ -28,6 +28,8 @@ button:disabled{opacity:.5;cursor:wait}
 #msg.ok{border-color:#2ecc71}#msg.err{border-color:var(--red)}
 small{color:var(--mute);display:block;margin-top:6px}
 .hide{display:none}
+#login .two{grid-template-columns:1fr;gap:0}
+#login input{direction:ltr;text-align:left}
 @media(max-width:600px){.row{flex-wrap:wrap}.row select{width:100%}}
 </style>
 </head>
@@ -42,7 +44,7 @@ small{color:var(--mute);display:block;margin-top:6px}
   </div>
   <div class="two">
     <div><label>البرانش</label><input id="branch" value="main"></div>
-    <div><label>GitHub Token</label><input id="token" type="password" placeholder="github_pat_..."></div>
+    <div><label>GitHub Token</label><input id="token" type="text" autocomplete="off" placeholder="github_pat_..."></div>
   </div>
   <small>التوكن بيتحفظ في متصفحك بس. اعمله Fine-grained على ريبو الموقع بس، وبصلاحية Contents: Read and write.</small>
   <p style="margin-top:14px"><button id="go">دخول</button></p>
@@ -138,10 +140,19 @@ $('#addtype').onclick=()=>{const v=$('#newtype').value.trim();
   if(!v)return;if(data.types.includes(v))return msg('النوع موجود بالفعل','err');
   data.types.push(v);$('#newtype').value='';render();$('#sec').value=v};
 $('#go').onclick=async()=>{
-  cfg={owner:$('#owner').value.trim(),repo:$('#repo').value.trim(),branch:$('#branch').value.trim()||'main',token:$('#token').value.trim()};
-  try{msg('جاري الدخول...');await load();localStorage.zcfg=JSON.stringify(cfg);$('#msg').style.display='none'}catch(e){msg('فشل الدخول: '+e.message,'err')}
+  cfg={owner:$('#owner').value.trim(),repo:$('#repo').value.trim(),branch:$('#branch').value.trim()||'main',token:$('#token').value.replace(/[\s\u200b-\u200f\u202a-\u202e\ufeff]/g,'')};
+  if(!cfg.owner||!cfg.repo)return msg('اكتب اسم الحساب واسم الريبو','err');
+  if(!/^(github_pat_|ghp_)/.test(cfg.token)){localStorage.removeItem('zcfg');return msg('خانة التوكن مش فيها توكن صح. التوكن لازم يبدأ بـ github_pat_ . اللي في الخانة بيبدأ بـ "'+cfg.token.slice(0,8)+'" وطوله '+cfg.token.length+' حرف.','err')}
+  try{msg('جاري الدخول...');await load();localStorage.zcfg=JSON.stringify(cfg);$('#msg').style.display='none'}
+  catch(e){
+    const m=e.message;localStorage.removeItem('zcfg');
+    if(/bad credentials/i.test(m))msg('GitHub رفض التوكن (طوله '+cfg.token.length+' حرف). التوكن غلط أو منتهي أو اتمسح. اعمل توكن جديد وانسخه بالكامل.','err');
+    else if(/not found/i.test(m))msg('مش لاقي الريبو أو الملف. اتأكد من اسم الحساب ('+cfg.owner+') واسم الريبو ('+cfg.repo+') والبرانش ('+cfg.branch+')، ومن إن data.json مرفوع، ومن إن التوكن مديله صلاحية على الريبو ده.','err');
+    else if(/not accessible/i.test(m))msg('التوكن ملوش صلاحية. خلّي Contents على Read and write.','err');
+    else msg('فشل الدخول: '+m,'err')}
 };
 $('#out').onclick=()=>{localStorage.removeItem('zcfg');location.reload()};
+const put=(path,body,onp)=>new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open('PUT',`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`);x.setRequestHeader('Authorization','Bearer '+cfg.token);x.setRequestHeader('Accept','application/vnd.github+json');x.upload.onprogress=e=>e.lengthComputable&&onp(Math.round(e.loaded/e.total*100));x.onload=()=>{let j={};try{j=JSON.parse(x.responseText)}catch(e){}x.status<300?res(j):rej(new Error(j.message||x.status))};x.onerror=()=>rej(new Error('انقطع الاتصال، جرب تاني'));x.send(body)});
 $('#add').onclick=async()=>{
   const title=$('#title').value.trim(),f=$('#file').files[0];let url=$('#url').value.trim();
   if(!title)return msg('اكتب عنوان للفيديو','err');
@@ -150,10 +161,10 @@ $('#add').onclick=async()=>{
   try{
     if(f){
       if(f.size>90*1024*1024)throw new Error('الملف أكبر من 90MB، صغّره أو استخدم رابط');
-      msg('جاري رفع الفيديو... استنى');
+      msg('جاري تجهيز الملف ('+(f.size/1048576).toFixed(1)+'MB)...');
       const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
       const path='videos/'+Date.now()+'-'+f.name.replace(/[^\w.-]/g,'_');
-      await api(path,{method:'PUT',body:JSON.stringify({message:'Upload '+f.name,content:b64,branch:cfg.branch})});
+      await put(path,JSON.stringify({message:'Upload '+f.name,content:b64,branch:cfg.branch}),p=>msg(p<100?'جاري رفع الفيديو... '+p+'%':'اترفع 100% — استنى GitHub يخلّص المعالجة...'));
       url=path;
     }
     const it={title,url,type:$('#sec').value};if($('#thumb').value.trim())it.thumb=$('#thumb').value.trim();
