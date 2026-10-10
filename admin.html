@@ -152,6 +152,7 @@ $('#go').onclick=async()=>{
     else msg('فشل الدخول: '+m,'err')}
 };
 $('#out').onclick=()=>{localStorage.removeItem('zcfg');location.reload()};
+const explain=e=>/not accessible/i.test(e.message)?'التوكن بيقرا بس ومش بيكتب. اعمل توكن Classic بصلاحية public_repo (بيبدأ بـ ghp_)، أو عدّل الـ Fine-grained: Repository access = portfolio وContents = Read and write.':'خطأ: '+e.message;
 const put=(path,body,onp)=>new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open('PUT',`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`);x.setRequestHeader('Authorization','Bearer '+cfg.token);x.setRequestHeader('Accept','application/vnd.github+json');x.upload.onprogress=e=>e.lengthComputable&&onp(Math.round(e.loaded/e.total*100));x.onload=()=>{let j={};try{j=JSON.parse(x.responseText)}catch(e){}x.status<300?res(j):rej(new Error(j.message||x.status))};x.onerror=()=>rej(new Error('انقطع الاتصال، جرب تاني'));x.send(body)});
 $('#add').onclick=async()=>{
   const title=$('#title').value.trim(),f=$('#file').files[0];let url=$('#url').value.trim();
@@ -171,7 +172,7 @@ $('#add').onclick=async()=>{
     data.items.unshift(it);
     $('#title').value=$('#url').value=$('#thumb').value='';$('#file').value='';render();
     msg('اتضاف. دوس "حفظ ونشر التعديلات" عشان تظهر في الموقع.','ok');
-  }catch(e){msg('خطأ: '+e.message,'err')}
+  }catch(e){msg(explain(e),'err')}
   b.disabled=false;
 };
 $('#save').onclick=async()=>{
@@ -179,7 +180,7 @@ $('#save').onclick=async()=>{
   try{
     const r=await api('data.json',{method:'PUT',body:JSON.stringify({message:'Update portfolio',content:u8(JSON.stringify(data,null,2)),sha,branch:cfg.branch})});
     sha=r.content.sha;msg('اتحفظ ✔ الموقع هيتحدّث خلال دقيقة.','ok');
-  }catch(e){msg('خطأ: '+e.message,'err')}
+  }catch(e){msg(explain(e),'err')}
   b.disabled=false;
 };
 if(cfg.token){$('#owner').value=cfg.owner;$('#repo').value=cfg.repo;$('#branch').value=cfg.branch;$('#token').value=cfg.token;$('#go').click()}
