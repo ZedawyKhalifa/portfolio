@@ -7,9 +7,11 @@
 <meta name="description" content="Zedawy is a visual artist: video editing, motion graphics, brand identity and design.">
 <meta property="og:title" content="Zedawy — Visual Artist">
 <meta property="og:description" content="I'll take your brand to the world of Fashion 2090.">
-<meta property="og:image" content="logo.png">
+<meta property="og:image" content="og.jpg">
 <meta name="theme-color" content="#000000">
-<link rel="icon" href="logo.png">
+<link rel="icon" type="image/png" href="favicon.png?v=3">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=3">
+<link rel="preload" as="image" href="portrait.webp">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Unbounded:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--d:Unbounded,Outfit,system-ui,sans-serif;--mute:#a0a0a0;--red:#f00;--line:#262626;--pad:clamp(16px,5vw,64px)}
@@ -28,14 +30,28 @@ nav{display:flex;gap:26px;align-items:center;font-weight:600}
 nav a{text-decoration:none;color:var(--mute)}
 nav a:hover{color:#fff}
 nav .hire{background:var(--red);color:#fff;padding:8px 18px;border-radius:4px}
-.hero{position:relative;overflow:hidden;padding:clamp(60px,11vw,140px) var(--pad) 70px;background:radial-gradient(circle 420px at var(--mx,70%) var(--my,30%),#ff000026,transparent 70%);isolation:isolate}
+.hero{position:relative;overflow:hidden;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:clamp(24px,5vw,80px);padding:clamp(40px,7vw,90px) var(--pad) 70px;background:radial-gradient(circle 420px at var(--mx,70%) var(--my,30%),#ff000026,transparent 70%);isolation:isolate}
 .bgv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.28;z-index:-2}
 .floor{position:absolute;left:-20%;right:-20%;bottom:-8%;height:55%;z-index:-1;perspective:500px;pointer-events:none;-webkit-mask:linear-gradient(transparent,#000 70%);mask:linear-gradient(transparent,#000 70%)}
 .floor div{position:absolute;inset:0;transform:rotateX(62deg);transform-origin:50% 100%;background:repeating-linear-gradient(90deg,#ff000066 0 2px,transparent 2px 70px),repeating-linear-gradient(0deg,#ff000066 0 2px,transparent 2px 70px);animation:go 3s linear infinite}
 @keyframes go{to{background-position:0 70px,0 70px}}
-.hero h1{font-family:var(--d);font-size:clamp(40px,9.5vw,136px);font-weight:700;line-height:1.08;letter-spacing:-.02em;animation:rise 1s cubic-bezier(.2,.8,.2,1) both}
+.hero h1{font-family:var(--d);font-size:clamp(40px,6.6vw,104px);font-weight:700;line-height:1.08;letter-spacing:-.02em;animation:rise 1s cubic-bezier(.2,.8,.2,1) both}
 .hero h1 em{font-style:normal;color:var(--red);text-shadow:0 0 50px #f006}
 .hero p{margin-top:30px;max-width:28ch;font-family:var(--d);font-size:clamp(17px,2.2vw,28px);font-weight:500;line-height:1.45;letter-spacing:0}
+.portrait{position:relative;justify-self:center;width:min(100%,460px)}
+.portrait::before{content:"";position:absolute;inset:6% -14%;background:radial-gradient(circle,#f006,transparent 65%);filter:blur(34px);z-index:-1}
+.pframe{position:relative;aspect-ratio:4/5;background:#fd0100;border-radius:10px;overflow:hidden;border:1px solid #ffffff2a;transition:transform .25s cubic-bezier(.2,.8,.2,1);will-change:transform;animation:wipe 1.4s .15s cubic-bezier(.7,0,.2,1) backwards}
+.pframe img{width:100%;height:100%;object-fit:cover;display:block;animation:settle 1.8s .15s cubic-bezier(.2,.8,.2,1) backwards}
+.pframe::before,.pframe::after{content:"";position:absolute;top:0;bottom:0;width:22px;background:repeating-linear-gradient(180deg,#e8e8e8 0 12px,transparent 12px 24px) 7px 0/8px 100% no-repeat #000;z-index:1}
+.pframe::before{left:0}.pframe::after{right:0}
+@keyframes wipe{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0)}}
+@keyframes settle{from{transform:scale(1.25)}}
+.badge{position:absolute;left:-12%;bottom:-6%;width:34%;aspect-ratio:1;border-radius:50%;background:#000;border:1px solid #ffffff33;display:grid;place-items:center;z-index:2;animation:rise 1s .8s cubic-bezier(.2,.8,.2,1) backwards}
+.badge svg{position:absolute;inset:0;width:100%;height:100%;animation:spin 18s linear infinite}
+.badge i{width:24%;height:21%;background:var(--red);clip-path:polygon(0 0,100% 50%,0 100%);margin-left:4%}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chip{position:absolute;right:-5%;top:9%;background:#000;border:1px solid #ffffff33;padding:8px 16px;border-radius:99px;font-family:var(--d);font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;z-index:2;animation:rise 1s 1s cubic-bezier(.2,.8,.2,1) backwards}
+.chip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 12px var(--red)}
 .cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px;animation:rise 1s .3s cubic-bezier(.2,.8,.2,1) both}
 .btn{display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;border:1px solid var(--red);border-radius:4px;padding:14px 26px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none;transition:box-shadow .25s}
 .btn:hover{box-shadow:0 0 34px #f008}
@@ -108,6 +124,7 @@ dialog::backdrop{background:#000e}
 .rv.in{opacity:1;transform:none}
 @media(hover:hover){body,a,button{cursor:none}}
 @media(max-width:1000px){.gallery{grid-template-columns:repeat(2,1fr);grid-auto-rows:clamp(130px,26vw,220px)}.gallery .card:nth-child(10n+1),.gallery .card:nth-child(10n+6){grid-column:1/span 2;grid-row:span 2}}
+@media(max-width:860px){.hero{grid-template-columns:1fr}.portrait{order:-1;width:min(74%,330px);margin-bottom:30px}.badge{left:-10%}.chip{right:-8%}}
 @media(max-width:760px){.about{grid-template-columns:1fr}nav a:not(.hire){display:none}}
 @media(max-width:600px){.gallery{grid-template-columns:1fr;grid-auto-rows:auto}.gallery .card:nth-child(n){grid-column:auto;grid-row:auto;aspect-ratio:16/9;height:auto}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
@@ -122,9 +139,16 @@ dialog::backdrop{background:#000e}
 
 <div class="hero" id="top">
   <div class="floor"><div></div></div>
+  <div class="txt">
   <h1>Visual<br><em>Artist.</em></h1>
   <p id="tag">I’ll take your brand to the world of Fashion 2090</p>
   <div class="cta"><a class="btn" href="#work"><i></i>See my work</a><button class="btn o" id="reelbtn" hidden><i></i>Watch showreel</button></div>
+  </div>
+  <div class="portrait">
+    <div class="pframe" id="pframe"><img src="portrait.webp" alt="Ziad, known as Zedawy" width="800" height="1000" fetchpriority="high"></div>
+    <div class="badge" aria-hidden="true"><svg viewBox="0 0 100 100"><path id="cp" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0" fill="none"/><text font-size="8.6" fill="#fff" font-family="Unbounded,sans-serif" font-weight="500"><textPath href="#cp" textLength="236" lengthAdjust="spacing">VISUAL ARTIST • FASHION 2090 • </textPath></text></svg><i></i></div>
+    <div class="chip">Zedawy</div>
+  </div>
 </div>
 <div class="reel" aria-hidden="true"><div id="marq"></div></div>
 
@@ -182,6 +206,8 @@ if(hov){const c=$('cur');let x=0,y=0,tx=0,ty=0;
   addEventListener('pointermove',e=>{tx=e.clientX;ty=e.clientY;c.style.opacity=1});
   (function f(){x+=(tx-x)*.2;y+=(ty-y)*.2;c.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%)`;requestAnimationFrame(f)})();
   document.addEventListener('pointerover',e=>c.classList.toggle('big',!!e.target.closest('a,button')))}
+const pf=$('pframe');
+if(hov){hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;pf.style.transform=`perspective(900px) rotateY(${x*9}deg) rotateX(${-y*7}deg)`});hero.addEventListener('pointerleave',()=>pf.style.transform='')}
 function scramble(el,txt){const ch='01#/<>*+';let i=0;const t=setInterval(()=>{el.textContent=txt.split('').map((c,j)=>j<i||c===' '?c:ch[Math.random()*ch.length|0]).join('');i+=1.2;if(i>txt.length){el.textContent=txt;clearInterval(t)}},28)}
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);
   if(e.target.id==='stats')e.target.querySelectorAll('b').forEach(b=>{const n=parseFloat(b.dataset.n);if(isNaN(n))return;const s=b.dataset.s||'';let k=0;const t=setInterval(()=>{k+=.04;b.textContent=Math.round(n*Math.min(k,1))+s;if(k>=1)clearInterval(t)},30)})}}),{threshold:.15});
