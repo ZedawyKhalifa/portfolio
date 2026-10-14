@@ -157,15 +157,16 @@ function render(){
     $$('.up').onclick=()=>swap(data.items,i,i-1);
     $$('.dn').onclick=()=>swap(data.items,i,i+1);
     $$('.del').onclick=()=>{if(confirm('تحذف "'+it.title+'"'+(g?' بكل فيديوهاته':'')+'؟')){SEL.delete(it);data.items.splice(i,1);render()}};
-    if(g)$$('.un').onclick=()=>{if(confirm('تفك المشروع لفيديوهات مستقلة؟')){data.items.splice(i,1,...it.videos.map(v=>({...v,type:it.type})));render()}};
+    if(g)$$('.un').onclick=()=>{if(confirm('تفك المشروع لفيديوهات مستقلة؟')){data.items.splice(i,1,...it.videos.map(v=>({...v,type:v.type||it.type})));render()}};
     wrap.appendChild(r);
     if(g){
       const sub=document.createElement('div');sub.className='sub';
       it.videos.forEach((v,j)=>{
         const vr=document.createElement('div');vr.className='row';
-        vr.innerHTML=`${pv(v)}<input class="t" value="${q(v.title)}"><button class="g th">صورة</button><button class="g up">↑</button><button class="g dn">↓</button><button class="del">حذف</button>`;
+        vr.innerHTML=`${pv(v)}<input class="t" value="${q(v.title)}"><select class="vt" title="نوع الفيديو ده">${opts(v.type||it.type)}</select><button class="g th">صورة</button><button class="g up">↑</button><button class="g dn">↓</button><button class="del">حذف</button>`;
         const $v=s=>vr.querySelector(s);
         $v('.t').oninput=e=>v.title=e.target.value;
+        $v('.vt').onchange=e=>v.type=e.target.value;
         $v('.th').onclick=()=>pick(v);
         $v('.up').onclick=()=>{swap(it.videos,j,j-1);it.url=it.videos[0].url};
         $v('.dn').onclick=()=>{swap(it.videos,j,j+1);it.url=it.videos[0].url};
@@ -182,7 +183,7 @@ $('#merge').onclick=()=>{
   if(!sel.length)return msg('علّم ✔ على الفيديوهات اللي عايز تجمعها الأول','err');
   const name=(prompt('اسم المشروع الجديد:',sel[0].title)||'').trim();if(!name)return;
   const first=data.items.indexOf(sel[0]);
-  const g={title:name,type:sel[0].type,url:sel[0].url,videos:sel.map(o=>{const v={title:o.title,url:o.url};if(o.thumb)v.thumb=o.thumb;if(o._pv)v._pv=o._pv;return v})};
+  const g={title:name,type:sel[0].type,url:sel[0].url,videos:sel.map(o=>{const v={title:o.title,url:o.url,type:o.type};if(o.thumb)v.thumb=o.thumb;if(o._pv)v._pv=o._pv;return v})};
   if(sel[0].thumb)g.thumb=sel[0].thumb;if(sel[0]._pv)g._pv=sel[0]._pv;
   data.items=data.items.filter(x=>!SEL.has(x));data.items.splice(Math.min(first,data.items.length),0,g);SEL.clear();render();
   msg('اتجمعوا في مشروع "'+name+'". دوس "حفظ ونشر التعديلات".','ok');
@@ -230,7 +231,7 @@ $('#add').onclick=async()=>{
     if(proj){
       let g=data.items.find(x=>isG(x)&&x.title===proj);
       if(!g){g={title:proj,type:it.type,videos:[]};data.items.unshift(g)}
-      const v={title:it.title||('Part '+(g.videos.length+1)),url:it.url};if(it.thumb)v.thumb=it.thumb;if(it._pv)v._pv=it._pv;
+      const v={title:it.title||('Part '+(g.videos.length+1)),url:it.url,type:it.type};if(it.thumb)v.thumb=it.thumb;if(it._pv)v._pv=it._pv;
       g.videos.push(v);g.url=g.videos[0].url;
     }else data.items.unshift(it);
     $('#title').value=$('#url').value=$('#thumb').value='';$('#file').value='';$('#thumbfile').value='';render();
