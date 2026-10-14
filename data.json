@@ -22,25 +22,28 @@
   ],
   "items": [
     {
-      "title": "Saudi National Day_4",
+      "title": "Saudi National Day",
+      "type": "Motion",
       "url": "https://drive.google.com/file/d/12l_WIAxlTLH_rnioKK3BLP9KhsNB531-/view?usp=sharing",
-      "type": "Motion"
-    },
-    {
-      "title": "Saudi National Day_3",
-      "url": "https://drive.google.com/file/d/1NkagCR6NYLTgRJJ9_B3GsWvNS0LL129b/view?usp=drive_link",
-      "type": "Motion"
-    },
-    {
-      "title": "Saudi National Day_2",
-      "url": "https://drive.google.com/file/d/1GyEYlcNy4QlIFaIJvTSKoxc6ig_eeGKp/view?usp=drive_link",
-      "type": "AI"
-    },
-    {
-      "title": "Saudi National Day_1",
-      "url": "https://drive.google.com/file/d/1yMEUjw3iSEzzKaf5bRF_QCgYYaAHqbCU/view?usp=sharing",
-      "thumb": "thumbs/1791990442521.jpg",
-      "type": "Motion"
+      "videos": [
+        {
+          "title": "Saudi National Day_4",
+          "url": "https://drive.google.com/file/d/12l_WIAxlTLH_rnioKK3BLP9KhsNB531-/view?usp=sharing"
+        },
+        {
+          "title": "Saudi National Day_3",
+          "url": "https://drive.google.com/file/d/1NkagCR6NYLTgRJJ9_B3GsWvNS0LL129b/view?usp=drive_link"
+        },
+        {
+          "title": "Saudi National Day_2",
+          "url": "https://drive.google.com/file/d/1GyEYlcNy4QlIFaIJvTSKoxc6ig_eeGKp/view?usp=drive_link"
+        },
+        {
+          "title": "Saudi National Day_1",
+          "url": "https://drive.google.com/file/d/1yMEUjw3iSEzzKaf5bRF_QCgYYaAHqbCU/view?usp=sharing",
+          "thumb": "thumbs/1791990442521.jpg"
+        }
+      ]
     },
     {
       "title": "Shadan-Branding-Identity",
