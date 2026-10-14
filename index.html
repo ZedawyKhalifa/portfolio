@@ -138,10 +138,10 @@ dialog button,dialog input{cursor:pointer!important}
 .ctl{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s}
 .stage.paused .ctl,.stage.show .ctl,.stage:hover .ctl{opacity:1}
 .ctl>*{pointer-events:auto}
-.stage .big{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px;border-radius:50%;border:0;background:var(--red);display:grid;place-items:center;box-shadow:0 0 50px #f008;transition:transform .2s}
-.stage .big:hover{transform:scale(1.1)}
-.stage .big i{width:26px;height:28px;background:#fff;clip-path:polygon(0 0,100% 50%,0 100%);margin-left:5px}
-.stage:not(.paused) .big{display:none}
+.stage .pbtn{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px;padding:0;border-radius:50%;border:0;background:var(--red);display:grid;place-items:center;box-shadow:0 0 50px #f008;transition:transform .2s}
+.stage .pbtn:hover{transform:scale(1.1)}
+.stage .pbtn i{width:26px;height:28px;background:#fff;clip-path:polygon(0 0,100% 50%,0 100%);margin-left:5px}
+.stage:not(.paused) .pbtn{display:none}
 .bar2{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:12px;padding:36px 16px 12px;background:linear-gradient(transparent,#000c)}
 .bar2 button{background:none;border:0;color:#fff;width:34px;height:34px;padding:6px;flex:none;opacity:.9}
 .bar2 button:hover{color:var(--red);opacity:1}
@@ -182,7 +182,7 @@ dialog button,dialog input{cursor:pointer!important}
 .pst img,.pst video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .pst img{opacity:0;transition:opacity .4s}.pst img.ld{opacity:1}
 .pst::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 55%,#0009)}
-.stage.poster .big{z-index:2}
+.stage.poster .pbtn{z-index:2}
 </style>
 </head>
 <body>
@@ -256,9 +256,9 @@ function mkPoster(it){
   clearStage();const u=it.url;
   stage.style.setProperty('--ar',/shorts\//.test(u)?.5625:1.7778);
   stage.classList.add('poster','paused','ready');
-  stage.innerHTML=`<div class="pst">${thumb(it)}</div><button class="big" aria-label="Play"><i></i></button>`;
+  stage.innerHTML=`<div class="pst">${thumb(it)}</div><button class="pbtn" aria-label="Play"><i></i></button>`;
   const go=()=>{PST=null;mkPlayer(it)};
-  stage.querySelector('.pst').onclick=stage.querySelector('.big').onclick=go;PST=go;
+  stage.querySelector('.pst').onclick=stage.querySelector('.pbtn').onclick=go;PST=go;
 }
 function clearStage(){PST=null;const v=stage.querySelector('video');if(v){v.pause();v.removeAttribute('src');v.load()}stage.innerHTML='';stage.className='stage';PL=null}
 function mkPlayer(it){
@@ -272,7 +272,7 @@ function mkPlayer(it){
   }
   const vd=document.createElement('video');vd.src=u;vd.playsInline=true;vd.autoplay=true;vd.preload='auto';if(it.thumb)vd.poster=it.thumb;
   const ui=document.createElement('div');ui.className='ctl';
-  ui.innerHTML=`<button class="big" aria-label="Play"><i></i></button><div class="bar2"><button class="pp" aria-label="Play or pause"></button><span class="tm">0:00</span><input class="seek" type="range" min="0" max="1000" value="0" aria-label="Seek"><span class="du">0:00</span><button class="mu" aria-label="Mute">${ic.vol}</button><button class="fs" aria-label="Fullscreen">${ic.fs}</button></div>`;
+  ui.innerHTML=`<button class="pbtn" aria-label="Play"><i></i></button><div class="bar2"><button class="pp" aria-label="Play or pause"></button><span class="tm">0:00</span><input class="seek" type="range" min="0" max="1000" value="0" aria-label="Seek"><span class="du">0:00</span><button class="mu" aria-label="Mute">${ic.vol}</button><button class="fs" aria-label="Fullscreen">${ic.fs}</button></div>`;
   const q=s=>ui.querySelector(s),T=n=>{n=Math.floor(n||0);return Math.floor(n/60)+':'+String(n%60).padStart(2,'0')};
   const sync=()=>{q('.pp').innerHTML=vd.paused?ic.play:ic.pause;stage.classList.toggle('paused',vd.paused)};
   vd.onplay=vd.onpause=sync;
@@ -282,7 +282,7 @@ function mkPlayer(it){
   vd.onerror=()=>{stage.innerHTML='<div class="msg">This video could not be played. If it was just uploaded, wait a minute and try again. Otherwise export it as H.264 MP4.</div>'};
   q('.seek').oninput=e=>{if(vd.duration)vd.currentTime=vd.duration*e.target.value/1000};
   const tog=()=>vd.paused?vd.play().catch(()=>{}):vd.pause();
-  q('.pp').onclick=q('.big').onclick=vd.onclick=tog;
+  q('.pp').onclick=q('.pbtn').onclick=vd.onclick=tog;
   const mute=()=>{vd.muted=!vd.muted;q('.mu').innerHTML=vd.muted?ic.mute:ic.vol};
   const fs=()=>document.fullscreenElement?document.exitFullscreen():(stage.requestFullscreen?stage.requestFullscreen():vd.webkitEnterFullscreen&&vd.webkitEnterFullscreen());
   q('.mu').onclick=mute;q('.fs').onclick=fs;
