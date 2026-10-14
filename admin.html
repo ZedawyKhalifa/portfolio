@@ -31,6 +31,11 @@ small{color:var(--mute);display:block;margin-top:6px}
 .pv{width:56px;height:32px;border-radius:4px;object-fit:cover;background:#111;flex:none;display:block}
 #login .two{grid-template-columns:1fr;gap:0}
 #login input{direction:ltr;text-align:left}
+input.ck{flex:none!important;width:18px;height:18px;accent-color:#f00}
+.sub{margin:0 22px 14px 0;padding-right:10px;border-right:2px solid var(--red)}
+.gb{font-size:12px;color:#fff;background:#f00;border-radius:99px;padding:3px 10px;white-space:nowrap}
+.grp{border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:12px}
+.grp>.row:first-child input.t{font-weight:600}
 @media(max-width:600px){.row{flex-wrap:wrap}.row select{width:100%}}
 </style>
 </head>
@@ -58,6 +63,8 @@ small{color:var(--mute);display:block;margin-top:6px}
       <div><label>النوع</label><select id="sec"></select></div>
       <div><label>عنوان الفيديو</label><input id="title"></div>
     </div>
+    <label>اسم المشروع (اختياري) — لو كتبت اسم، الفيديو بينضاف جوه مشروع بالاسم ده مع باقي فيديوهاته، ويظهر في الموقع كارت واحد</label>
+    <input id="proj" list="projlist" placeholder="مثلاً: Brand X"><datalist id="projlist"></datalist>
     <label>رابط الفيديو (YouTube / Vimeo / Google Drive / رابط mp4 مباشر)</label>
     <input id="url" placeholder="https://...">
     <label>رابط صورة مصغرة Thumbnail (اختياري)</label>
@@ -76,7 +83,9 @@ small{color:var(--mute);display:block;margin-top:6px}
     <small>تغيير اسم نوع بيغيّره على كل الفيديوهات اللي تحته. ولازم تنقل فيديوهات النوع لنوع تاني قبل ما تحذفه.</small>
   </div>
 
-  <h2>الفيديوهات</h2><div id="items"></div>
+  <h2>الفيديوهات</h2>
+  <p class="row"><button class="g" id="merge">اجمع المحدد في مشروع واحد</button><small style="margin:0">علّم ✔ على الفيديوهات المستقلة اللي عايز تجمعها</small></p>
+  <div id="items"></div>
   <small>أول فيديو في القايمة بيظهر في المكان الكبير في الموقع.</small>
 
   <div class="box" style="margin-top:24px"><h2 style="margin-top:0">بيانات الموقع</h2><div id="site"></div></div>
@@ -89,6 +98,7 @@ small{color:var(--mute);display:block;margin-top:6px}
 
 <script>
 const $=s=>document.querySelector(s);
+const SEL=new Set(),isG=x=>Array.isArray(x.videos)&&x.videos.length>0,q=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 const DEFAULT_TYPES=['Editing','Motion','Branding','Design','AI'];
 let cfg=JSON.parse(localStorage.zcfg||'{}'),data={types:[],items:[],site:{}},sha=null;
 const msg=(t,c='')=>{const m=$('#msg');m.textContent=t;m.className=c;m.style.display='block'};
@@ -100,6 +110,8 @@ function norm(){
   if(!data.items){data.items=[...(data.editing||[]).map(i=>({...i,type:'Editing'})),...(data.motion||[]).map(i=>({...i,type:'Motion'}))]}
   delete data.editing;delete data.motion;
   if(!data.types||!data.types.length)data.types=[...DEFAULT_TYPES];
+  data.items.forEach(i=>{if(i.videos&&!i.videos.length)delete i.videos});
+  data.items=data.items.filter(i=>i.url||(i.videos&&i.videos.length));
   data.items.forEach(i=>{if(!i.type)i.type=data.types[0];if(!data.types.includes(i.type))data.types.push(i.type)});
 }
 async function load(){
@@ -127,20 +139,54 @@ function render(){
     tb.appendChild(r);
   });
   const box=$('#items');box.innerHTML='';
+  $('#projlist').innerHTML=data.items.filter(isG).map(x=>`<option value="${q(x.title)}">`).join('');
   if(!data.items.length)box.innerHTML='<small>مفيش فيديوهات لسه.</small>';
+  const swap=(arr,i,j)=>{if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];render()};
+  const pick=o=>{const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(!f.files[0])return;try{msg('جاري رفع الصورة...');await upThumb(f.files[0],o);render();msg('اتغيرت الصورة. دوس "حفظ ونشر التعديلات".','ok')}catch(e){msg(explain(e),'err')}};f.click()};
+  const pv=o=>{const s=o._pv||o.thumb;return s?`<img class="pv" src="${q(s)}" alt="">`:'<span class="pv"></span>'};
   data.items.forEach((it,i)=>{
+    const g=isG(it),wrap=document.createElement('div');if(g)wrap.className='grp';
     const r=document.createElement('div');r.className='row';
-    r.innerHTML=`${it.thumb?`<img class="pv" src="${it.thumb.replace(/"/g,'&quot;')}" alt="">`:'<span class="pv"></span>'}<input value="${it.title.replace(/"/g,'&quot;')}"><select>${opts(it.type)}</select><button class="g" title="غيّر الصورة المصغرة">صورة</button><button class="g" title="فوق">↑</button><button class="g" title="تحت">↓</button><button title="حذف">حذف</button>`;
-    const [pv,inp,sel,th,up,dn,del]=r.children;
-    th.onclick=()=>{const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(!f.files[0])return;try{msg('جاري رفع الصورة...');it.thumb=await upThumb(f.files[0]);render();msg('اتغيرت الصورة. دوس "حفظ ونشر التعديلات".','ok')}catch(e){msg(explain(e),'err')}};f.click()};
-    inp.oninput=()=>it.title=inp.value;
-    sel.onchange=()=>it.type=sel.value;
-    up.onclick=()=>{if(i){[data.items[i-1],data.items[i]]=[data.items[i],data.items[i-1]];render()}};
-    dn.onclick=()=>{if(i<data.items.length-1){[data.items[i+1],data.items[i]]=[data.items[i],data.items[i+1]];render()}};
-    del.onclick=()=>{if(confirm('تحذف "'+it.title+'"؟')){data.items.splice(i,1);render()}};
-    box.appendChild(r);
+    const cv=it.thumb?it:(g?it.videos[0]:it);
+    r.innerHTML=`${g?'':'<input type="checkbox" class="ck" title="تحديد للجمع">'}${pv(cv)}<input class="t" value="${q(it.title)}">${g?`<span class="gb">مشروع · ${it.videos.length}</span>`:''}<select>${opts(it.type)}</select><button class="g th" title="${g?'صورة الغلاف':'غيّر الصورة المصغرة'}">${g?'غلاف':'صورة'}</button><button class="g up">↑</button><button class="g dn">↓</button>${g?'<button class="g un" title="فك المجموعة لفيديوهات مستقلة">فك</button>':''}<button class="del">حذف</button>`;
+    const $$=s=>r.querySelector(s);
+    if(!g){const ck=$$('.ck');ck.checked=SEL.has(it);ck.onchange=()=>ck.checked?SEL.add(it):SEL.delete(it)}
+    $$('.th').onclick=()=>pick(it);
+    $$('.t').oninput=e=>it.title=e.target.value;
+    $$('select').onchange=e=>it.type=e.target.value;
+    $$('.up').onclick=()=>swap(data.items,i,i-1);
+    $$('.dn').onclick=()=>swap(data.items,i,i+1);
+    $$('.del').onclick=()=>{if(confirm('تحذف "'+it.title+'"'+(g?' بكل فيديوهاته':'')+'؟')){SEL.delete(it);data.items.splice(i,1);render()}};
+    if(g)$$('.un').onclick=()=>{if(confirm('تفك المشروع لفيديوهات مستقلة؟')){data.items.splice(i,1,...it.videos.map(v=>({...v,type:it.type})));render()}};
+    wrap.appendChild(r);
+    if(g){
+      const sub=document.createElement('div');sub.className='sub';
+      it.videos.forEach((v,j)=>{
+        const vr=document.createElement('div');vr.className='row';
+        vr.innerHTML=`${pv(v)}<input class="t" value="${q(v.title)}"><button class="g th">صورة</button><button class="g up">↑</button><button class="g dn">↓</button><button class="del">حذف</button>`;
+        const $v=s=>vr.querySelector(s);
+        $v('.t').oninput=e=>v.title=e.target.value;
+        $v('.th').onclick=()=>pick(v);
+        $v('.up').onclick=()=>{swap(it.videos,j,j-1);it.url=it.videos[0].url};
+        $v('.dn').onclick=()=>{swap(it.videos,j,j+1);it.url=it.videos[0].url};
+        $v('.del').onclick=()=>{if(!confirm('تحذف "'+(v.title||'الفيديو')+'"؟'))return;it.videos.splice(j,1);if(!it.videos.length)data.items.splice(i,1);else it.url=it.videos[0].url;render()};
+        sub.appendChild(vr);
+      });
+      wrap.appendChild(sub);
+    }
+    box.appendChild(wrap);
   });
 }
+$('#merge').onclick=()=>{
+  const sel=data.items.filter(x=>SEL.has(x));
+  if(!sel.length)return msg('علّم ✔ على الفيديوهات اللي عايز تجمعها الأول','err');
+  const name=(prompt('اسم المشروع الجديد:',sel[0].title)||'').trim();if(!name)return;
+  const first=data.items.indexOf(sel[0]);
+  const g={title:name,type:sel[0].type,url:sel[0].url,videos:sel.map(o=>{const v={title:o.title,url:o.url};if(o.thumb)v.thumb=o.thumb;if(o._pv)v._pv=o._pv;return v})};
+  if(sel[0].thumb)g.thumb=sel[0].thumb;if(sel[0]._pv)g._pv=sel[0]._pv;
+  data.items=data.items.filter(x=>!SEL.has(x));data.items.splice(Math.min(first,data.items.length),0,g);SEL.clear();render();
+  msg('اتجمعوا في مشروع "'+name+'". دوس "حفظ ونشر التعديلات".','ok');
+};
 $('#addtype').onclick=()=>{const v=$('#newtype').value.trim();
   if(!v)return;if(data.types.includes(v))return msg('النوع موجود بالفعل','err');
   data.types.push(v);$('#newtype').value='';render();$('#sec').value=v};
@@ -163,10 +209,11 @@ const explain=e=>{
   return 'خطأ: '+e.message};
 const shrink=f=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>{const w=Math.min(1280,im.width),h=Math.round(im.height*w/im.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);res(c.toDataURL('image/jpeg',.85).split(',')[1])};im.onerror=()=>rej(new Error('الصورة مش مقروءة'));im.src=URL.createObjectURL(f)});
 const put=(path,body,onp)=>new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open('PUT',`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`);x.setRequestHeader('Authorization','Bearer '+cfg.token);x.setRequestHeader('Accept','application/vnd.github+json');x.upload.onprogress=e=>e.lengthComputable&&onp(Math.round(e.loaded/e.total*100));x.onload=()=>{let j={};try{j=JSON.parse(x.responseText)}catch(e){}x.status<300?res(j):rej(new Error(j.message||x.status))};x.onerror=()=>rej(new Error('انقطع الاتصال، جرب تاني'));x.send(body)});
-const upThumb=async f=>{const b64=await shrink(f),path='thumbs/'+Date.now()+'.jpg';await put(path,JSON.stringify({message:'Upload thumbnail',content:b64,branch:cfg.branch}),()=>{});return path};
+const upThumb=async(f,it)=>{const b64=await shrink(f),path='thumbs/'+Date.now()+'.jpg';const r=await put(path,JSON.stringify({message:'Upload thumbnail',content:b64,branch:cfg.branch}),()=>{});it.thumb=path;it._pv=r.content&&r.content.download_url};
 $('#add').onclick=async()=>{
   const title=$('#title').value.trim(),f=$('#file').files[0];let url=$('#url').value.trim();
-  if(!title)return msg('اكتب عنوان للفيديو','err');
+  const proj=$('#proj').value.trim();
+  if(!title&&!proj)return msg('اكتب عنوان للفيديو (أو اسم المشروع)','err');
   if(!url&&!f)return msg('حط رابط أو اختار ملف','err');
   const b=$('#add');b.disabled=true;
   try{
@@ -179,8 +226,13 @@ $('#add').onclick=async()=>{
       url=path;
     }
     const it={title,url,type:$('#sec').value};if($('#thumb').value.trim())it.thumb=$('#thumb').value.trim();
-    const tf=$('#thumbfile').files[0];if(tf){msg('جاري رفع الصورة المصغرة...');it.thumb=await upThumb(tf)}
-    data.items.unshift(it);
+    const tf=$('#thumbfile').files[0];if(tf){msg('جاري رفع الصورة المصغرة...');await upThumb(tf,it)}
+    if(proj){
+      let g=data.items.find(x=>isG(x)&&x.title===proj);
+      if(!g){g={title:proj,type:it.type,videos:[]};data.items.unshift(g)}
+      const v={title:it.title||('Part '+(g.videos.length+1)),url:it.url};if(it.thumb)v.thumb=it.thumb;if(it._pv)v._pv=it._pv;
+      g.videos.push(v);g.url=g.videos[0].url;
+    }else data.items.unshift(it);
     $('#title').value=$('#url').value=$('#thumb').value='';$('#file').value='';$('#thumbfile').value='';render();
     msg('اتضاف. دوس "حفظ ونشر التعديلات" عشان تظهر في الموقع.','ok');
   }catch(e){msg(explain(e),'err')}
@@ -189,8 +241,8 @@ $('#add').onclick=async()=>{
 $('#save').onclick=async()=>{
   const b=$('#save');b.disabled=true;msg('جاري الحفظ...');
   try{
-    const r=await api('data.json',{method:'PUT',body:JSON.stringify({message:'Update portfolio',content:u8(JSON.stringify(data,null,2)),sha,branch:cfg.branch})});
-    sha=r.content.sha;msg('اتحفظ ✔ الموقع هيتحدّث خلال دقيقة.','ok');
+    const r=await api('data.json',{method:'PUT',body:JSON.stringify({message:'Update portfolio',content:u8(JSON.stringify(data,(k,v)=>k==='_pv'?undefined:v,2)),sha,branch:cfg.branch})});
+    sha=r.content.sha;msg('اتحفظ ✔ GitHub بينشر الموقع دلوقتي. استنى دقيقتين وبعدها افتح الموقع واعمل تحديث قوي.','ok');
   }catch(e){msg(explain(e),'err')}
   b.disabled=false;
 };
