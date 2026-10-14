@@ -92,12 +92,11 @@ section{padding:72px var(--pad) 24px}
 .card:hover .film{box-shadow:0 20px 60px #f003}
 .film::before,.film::after{content:"";position:absolute;left:8px;right:8px;height:7px;background:repeating-linear-gradient(90deg,#e8e8e8 0 12px,transparent 12px 24px);border-radius:2px}
 .film::before{top:6px}.film::after{bottom:6px}
-.media{position:relative;flex:1;min-width:0;background:#0b0b0b;overflow:hidden}
+.media{position:relative;flex:1;min-width:0;background:radial-gradient(circle at 30% 20%,#f003,transparent 60%),#0b0b0b;overflow:hidden}
 .media img,.media video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s}
 .card:hover .media img,.card:hover .media video{transform:scale(1.07)}
 .play{position:absolute;inset:0;display:grid;place-items:center;background:#0003}
-.play b{width:62px;height:46px;background:var(--red);clip-path:polygon(0 14%,100% 0,100% 100%,0 86%);transition:transform .2s}
-.card:hover .play b{transform:scale(1.2)}
+.play b{display:none}
 .card h3{margin-top:14px;font-size:18px;font-weight:600}
 .empty{color:var(--mute);border:1px dashed var(--line);padding:40px;border-radius:6px}
 .about{display:grid;grid-template-columns:1.2fr 1fr;gap:clamp(28px,6vw,90px)}
@@ -139,9 +138,9 @@ dialog button,dialog input{cursor:pointer!important}
 .ctl{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s}
 .stage.paused .ctl,.stage.show .ctl,.stage:hover .ctl{opacity:1}
 .ctl>*{pointer-events:auto}
-.big{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px;border-radius:50%;border:0;background:var(--red);display:grid;place-items:center;box-shadow:0 0 50px #f008;transition:transform .2s}
-.big:hover{transform:scale(1.1)}
-.big i{width:26px;height:28px;background:#fff;clip-path:polygon(0 0,100% 50%,0 100%);margin-left:5px}
+.stage .big{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px;border-radius:50%;border:0;background:var(--red);display:grid;place-items:center;box-shadow:0 0 50px #f008;transition:transform .2s}
+.stage .big:hover{transform:scale(1.1)}
+.stage .big i{width:26px;height:28px;background:#fff;clip-path:polygon(0 0,100% 50%,0 100%);margin-left:5px}
 .stage:not(.paused) .big{display:none}
 .bar2{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:12px;padding:36px 16px 12px;background:linear-gradient(transparent,#000c)}
 .bar2 button{background:none;border:0;color:#fff;width:34px;height:34px;padding:6px;flex:none;opacity:.9}
@@ -222,9 +221,13 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const list=s=>(s||'').split(',').map(x=>x.trim()).filter(Boolean);
 const direct=u=>!(yt(u)||vm(u)||gd(u));
 
+function imgErr(el){
+  if(!el.dataset.r){el.dataset.r=1;setTimeout(()=>{el.src=el.src.split('?')[0]+'?r='+Date.now()},3500);return}
+  if(el.dataset.v){const v=document.createElement('video');v.src=el.dataset.v+'#t=0.5';v.preload='metadata';v.muted=v.loop=v.playsInline=true;el.replaceWith(v)}else el.remove();
+}
 function thumb(it){
-  const im=u=>`<img src="${esc(u)}" alt="" loading="lazy" decoding="async" onload="this.classList.add('ld')">`;
-  if(it.thumb)return im(it.thumb);
+  const im=(u,v)=>`<img src="${esc(u)}" alt="" loading="lazy" decoding="async"${v?` data-v="${esc(v)}"`:''} onload="this.classList.add('ld')" onerror="imgErr(this)">`;
+  if(it.thumb)return im(it.thumb,direct(it.url)?it.url:'');
   const y=yt(it.url);if(y)return im('https://img.youtube.com/vi/'+y+'/hqdefault.jpg');
   if(!direct(it.url))return '<div class="ph"></div>';
   return `<video src="${esc(it.url)}#t=0.5" preload="metadata" muted loop playsinline></video>`;
@@ -251,7 +254,7 @@ function mkPlayer(it){
   vd.onloadedmetadata=()=>{if(vd.videoWidth)stage.style.setProperty('--ar',(vd.videoWidth/vd.videoHeight).toFixed(4));q('.du').textContent=T(vd.duration)};
   vd.onloadeddata=()=>stage.classList.add('ready');
   vd.ontimeupdate=()=>{const k=q('.seek');k.value=vd.duration?vd.currentTime/vd.duration*1000:0;k.style.setProperty('--p',k.value/10+'%');q('.tm').textContent=T(vd.currentTime)};
-  vd.onerror=()=>{stage.innerHTML='<div class="msg">This video could not be loaded.</div>'};
+  vd.onerror=()=>{stage.innerHTML='<div class="msg">This video could not be played. If it was just uploaded, wait a minute and try again. Otherwise export it as H.264 MP4.</div>'};
   q('.seek').oninput=e=>{if(vd.duration)vd.currentTime=vd.duration*e.target.value/1000};
   const tog=()=>vd.paused?vd.play().catch(()=>{}):vd.pause();
   q('.pp').onclick=q('.big').onclick=vd.onclick=tog;
