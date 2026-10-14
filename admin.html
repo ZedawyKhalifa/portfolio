@@ -28,6 +28,7 @@ button:disabled{opacity:.5;cursor:wait}
 #msg.ok{border-color:#2ecc71}#msg.err{border-color:var(--red)}
 small{color:var(--mute);display:block;margin-top:6px}
 .hide{display:none}
+.pv{width:56px;height:32px;border-radius:4px;object-fit:cover;background:#111;flex:none;display:block}
 #login .two{grid-template-columns:1fr;gap:0}
 #login input{direction:ltr;text-align:left}
 @media(max-width:600px){.row{flex-wrap:wrap}.row select{width:100%}}
@@ -61,6 +62,8 @@ small{color:var(--mute);display:block;margin-top:6px}
     <input id="url" placeholder="https://...">
     <label>رابط صورة مصغرة Thumbnail (اختياري)</label>
     <input id="thumb" placeholder="https://...jpg">
+    <label>أو ارفع صورة Thumbnail من جهازك (JPG أو PNG — الأفضل بنسبة 16:9)</label>
+    <input id="thumbfile" type="file" accept="image/*">
     <label>أو ارفع ملف فيديو (لحد 90MB)</label>
     <input id="file" type="file" accept="video/*">
     <p style="margin-top:14px"><button id="add">إضافة</button></p>
@@ -127,8 +130,9 @@ function render(){
   if(!data.items.length)box.innerHTML='<small>مفيش فيديوهات لسه.</small>';
   data.items.forEach((it,i)=>{
     const r=document.createElement('div');r.className='row';
-    r.innerHTML=`<input value="${it.title.replace(/"/g,'&quot;')}"><select>${opts(it.type)}</select><button class="g" title="فوق">↑</button><button class="g" title="تحت">↓</button><button title="حذف">حذف</button>`;
-    const [inp,sel,up,dn,del]=r.children;
+    r.innerHTML=`${it.thumb?`<img class="pv" src="${it.thumb.replace(/"/g,'&quot;')}" alt="">`:'<span class="pv"></span>'}<input value="${it.title.replace(/"/g,'&quot;')}"><select>${opts(it.type)}</select><button class="g" title="غيّر الصورة المصغرة">صورة</button><button class="g" title="فوق">↑</button><button class="g" title="تحت">↓</button><button title="حذف">حذف</button>`;
+    const [pv,inp,sel,th,up,dn,del]=r.children;
+    th.onclick=()=>{const f=document.createElement('input');f.type='file';f.accept='image/*';f.onchange=async()=>{if(!f.files[0])return;try{msg('جاري رفع الصورة...');it.thumb=await upThumb(f.files[0]);render();msg('اتغيرت الصورة. دوس "حفظ ونشر التعديلات".','ok')}catch(e){msg(explain(e),'err')}};f.click()};
     inp.oninput=()=>it.title=inp.value;
     sel.onchange=()=>it.type=sel.value;
     up.onclick=()=>{if(i){[data.items[i-1],data.items[i]]=[data.items[i],data.items[i-1]];render()}};
@@ -157,7 +161,9 @@ const explain=e=>{
   if(/bad credentials/i.test(e.message)){localStorage.removeItem('zcfg');return 'التوكن اللي الصفحة شغالة بيه دلوقتي (بينتهي بـ ...'+cfg.token.slice(-4)+') GitHub بقى يرفضه. دوس "خروج" وادخل بالتوكن الجديد.'}
   if(/not accessible/i.test(e.message))return 'التوكن بيقرا بس ومش بيكتب. اعمل توكن Classic بصلاحية public_repo (بيبدأ بـ ghp_)، أو عدّل الـ Fine-grained: Repository access = portfolio وContents = Read and write.';
   return 'خطأ: '+e.message};
+const shrink=f=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>{const w=Math.min(1280,im.width),h=Math.round(im.height*w/im.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);res(c.toDataURL('image/jpeg',.85).split(',')[1])};im.onerror=()=>rej(new Error('الصورة مش مقروءة'));im.src=URL.createObjectURL(f)});
 const put=(path,body,onp)=>new Promise((res,rej)=>{const x=new XMLHttpRequest();x.open('PUT',`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/${path}`);x.setRequestHeader('Authorization','Bearer '+cfg.token);x.setRequestHeader('Accept','application/vnd.github+json');x.upload.onprogress=e=>e.lengthComputable&&onp(Math.round(e.loaded/e.total*100));x.onload=()=>{let j={};try{j=JSON.parse(x.responseText)}catch(e){}x.status<300?res(j):rej(new Error(j.message||x.status))};x.onerror=()=>rej(new Error('انقطع الاتصال، جرب تاني'));x.send(body)});
+const upThumb=async f=>{const b64=await shrink(f),path='thumbs/'+Date.now()+'.jpg';await put(path,JSON.stringify({message:'Upload thumbnail',content:b64,branch:cfg.branch}),()=>{});return path};
 $('#add').onclick=async()=>{
   const title=$('#title').value.trim(),f=$('#file').files[0];let url=$('#url').value.trim();
   if(!title)return msg('اكتب عنوان للفيديو','err');
@@ -173,8 +179,9 @@ $('#add').onclick=async()=>{
       url=path;
     }
     const it={title,url,type:$('#sec').value};if($('#thumb').value.trim())it.thumb=$('#thumb').value.trim();
+    const tf=$('#thumbfile').files[0];if(tf){msg('جاري رفع الصورة المصغرة...');it.thumb=await upThumb(tf)}
     data.items.unshift(it);
-    $('#title').value=$('#url').value=$('#thumb').value='';$('#file').value='';render();
+    $('#title').value=$('#url').value=$('#thumb').value='';$('#file').value='';$('#thumbfile').value='';render();
     msg('اتضاف. دوس "حفظ ونشر التعديلات" عشان تظهر في الموقع.','ok');
   }catch(e){msg(explain(e),'err')}
   b.disabled=false;
