@@ -10,7 +10,7 @@
     "whatsapp": "201044772663",
     "linktree": "https://linktr.ee/ziad_zed",
     "instagram": "",
-    "behance": "https://www.behance.net/ziadreda9",
+    "behance": "",
     "youtube": ""
   },
   "types": [
@@ -22,6 +22,11 @@
     "AI & Motion"
   ],
   "items": [
+    {
+      "title": "SAM — Promotional Motion Video",
+      "url": "https://drive.google.com/file/d/1sbu175FQRKy5qCaO7rAFf-ZPii1TWFXz/view?usp=sharing",
+      "type": "Editing"
+    },
     {
       "title": "Saudi National Day",
       "type": "Motion",
@@ -50,11 +55,6 @@
         }
       ],
       "thumb": "thumbs/1791994028003.jpg"
-    },
-    {
-      "title": "SAM — Promotional Motion Video",
-      "url": "https://drive.google.com/file/d/1sbu175FQRKy5qCaO7rAFf-ZPii1TWFXz/view?usp=sharing",
-      "type": "Motion"
     },
     {
       "title": "Shadan-Branding-Identity",
