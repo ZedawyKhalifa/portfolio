@@ -24,24 +24,6 @@
   ],
   "items": [
     {
-      "title": "Logo Animation",
-      "type": "Logo Animation",
-      "url": "videos/1792512973247-advera_bg.mp4",
-      "videos": [
-        {
-          "title": "Advera Logo Animation",
-          "url": "videos/1792512973247-advera_bg.mp4",
-          "type": "Logo Animation"
-        },
-        {
-          "title": "Enjaz Logo Animation",
-          "url": "videos/1792512868683-enjaz.mp4",
-          "type": "Logo Animation"
-        }
-      ],
-      "thumb": "thumbs/1792513414264.jpg"
-    },
-    {
       "title": "ZED",
       "url": "videos/1792511675802-1754588267114.mp4",
       "type": "Motion",
@@ -99,6 +81,24 @@
         }
       ],
       "thumb": "thumbs/1791994028003.jpg"
+    },
+    {
+      "title": "Logo Animation",
+      "type": "Logo Animation",
+      "url": "videos/1792512973247-advera_bg.mp4",
+      "videos": [
+        {
+          "title": "Advera Logo Animation",
+          "url": "videos/1792512973247-advera_bg.mp4",
+          "type": "Logo Animation"
+        },
+        {
+          "title": "Enjaz Logo Animation",
+          "url": "videos/1792512868683-enjaz.mp4",
+          "type": "Logo Animation"
+        }
+      ],
+      "thumb": "thumbs/1792513414264.jpg"
     },
     {
       "title": "SM — Brand in Motion",
