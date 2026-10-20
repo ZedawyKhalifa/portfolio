@@ -19,9 +19,15 @@
     "Branding",
     "Design",
     "AI",
-    "AI & Motion"
+    "AI & Motion",
+    "Logo Animation"
   ],
   "items": [
+    {
+      "title": "Enjaz Logo Animation",
+      "url": "videos/1792512868683-enjaz.mp4",
+      "type": "Logo Animation"
+    },
     {
       "title": "ZED",
       "url": "videos/1792511675802-1754588267114.mp4",
