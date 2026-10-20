@@ -24,14 +24,22 @@
   ],
   "items": [
     {
-      "title": "Advera Logo Animation",
+      "title": "Logo Animation",
+      "type": "Logo Animation",
       "url": "videos/1792512973247-advera_bg.mp4",
-      "type": "Logo Animation"
-    },
-    {
-      "title": "Enjaz Logo Animation",
-      "url": "videos/1792512868683-enjaz.mp4",
-      "type": "Logo Animation"
+      "videos": [
+        {
+          "title": "Advera Logo Animation",
+          "url": "videos/1792512973247-advera_bg.mp4",
+          "type": "Logo Animation"
+        },
+        {
+          "title": "Enjaz Logo Animation",
+          "url": "videos/1792512868683-enjaz.mp4",
+          "type": "Logo Animation"
+        }
+      ],
+      "thumb": "thumbs/1792513414264.jpg"
     },
     {
       "title": "ZED",
